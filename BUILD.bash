@@ -7,6 +7,7 @@ declare -r dist_dir=${prefix}/dist
 declare -r src_dir=${prefix}/src
 
 export LD_LIBRARY_PATH=${prefix}/lib${LD_LIBRARY_PATH+:${LD_LIBRARY_PATH}}
+export PYTHONPATH=${prefix}/lib64/python2.6/site-packages${PYTHONPATH+:${PYTHONPATH}}
 
 mkdir -p -- "${src_dir}" || exit $?
 
@@ -32,12 +33,24 @@ if ! [[ -e "${prefix}/bin/ncdump" ]] ; then
   fi
   tar xf "${dist_dir}/${nc4}.tar.gz" || exit $?
   cd -- "${nc4}" || exit $?
-  CPPFLAGS=-I${prefix}/include LDFLAGS=-L${prefix}/lib ./configure --prefix=${prefix}
-  make check install
+  CPPFLAGS=-I${prefix}/include LDFLAGS=-L${prefix}/lib ./configure --prefix=${prefix} || exit $?
+  make check install || exit $?
+fi
+
+# numpy
+if ! [[ -e "${prefix}/bin/f2py" ]] ; then
+  numpy=numpy-1.9.1
+  cd -- "${src_dir}" || exit $?
+  if [[ -d "${numpy}" ]] ; then
+    rm -r "${numpy}" || exit $?
+  fi
+  tar xf "${dist_dir}/${numpy}.tar.gz" || exit $?
+  cd -- "${numpy}" || exit $?
+  python setup.py install "--prefix=${prefix}" || exit $?
 fi
 
 # netcdf4-python
-#if ! [[ -e "${prefix}/bin/h5dump" ]] ; then
+if ! [[ -e "${prefix}/bin/ncinfo" ]] ; then
   nc4py=netcdf4-python-1.1.1rel
   cd -- "${src_dir}" || exit $?
   if [[ -d "${nc4py}" ]] ; then
@@ -45,6 +58,6 @@ fi
   fi
   tar xf "${dist_dir}/${nc4py}.tar.gz" || exit $?
   cd -- "${nc4py}" || exit $?
-  HDF5_DIR=${prefix} python setup.py
-#fi
+  HDF5_DIR=${prefix} NETCDF4_DIR=${prefix} python setup.py install "--prefix=${prefix}" || exit $?
+fi
 
