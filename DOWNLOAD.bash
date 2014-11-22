@@ -24,4 +24,6 @@ dl f93d2d41ad98a50ca4bfe9799ed807a0 'https://github.com/Unidata/netcdf4-python/a
 dl 39b29e3580c0604f7cafc44a00d2ec4b 'http://www.hdfgroup.org/ftp/HDF5/current/bin/linux-centos6-x86_64-gcc447/hdf5-1.8.14-linux-centos6-x86_64-gcc447-shared.tar.gz'
 dl 2fd2365e1fe9685368cd6ab0ada532a0 'ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-4.3.2.tar.gz'
 dl 78842b73560ec378142665e712ae4ad9 'http://downloads.sourceforge.net/project/numpy/NumPy/1.9.1/numpy-1.9.1.tar.gz'
+dl e876322cac0d939b5dd9ce53ad708b7e 'https://cfunits-python.googlecode.com/files/cfunits-0.9.6.tar.gz'
+dl b81ab8f24125ce18702ab7b3ca4d566f 'ftp://ftp.unidata.ucar.edu/pub/udunits/udunits-2.2.17.tar.gz'
 

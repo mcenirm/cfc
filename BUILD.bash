@@ -7,7 +7,7 @@ declare -r dist_dir=${prefix}/dist
 declare -r src_dir=${prefix}/src
 
 export LD_LIBRARY_PATH=${prefix}/lib${LD_LIBRARY_PATH+:${LD_LIBRARY_PATH}}
-export PYTHONPATH=${prefix}/lib64/python2.6/site-packages${PYTHONPATH+:${PYTHONPATH}}
+export PYTHONPATH=${prefix}/lib64/python2.6/site-packages:${prefix}/lib/python2.6/site-packages${PYTHONPATH+:${PYTHONPATH}}
 
 mkdir -p -- "${src_dir}" || exit $?
 
@@ -59,5 +59,43 @@ if ! [[ -e "${prefix}/bin/ncinfo" ]] ; then
   tar xf "${dist_dir}/${nc4py}.tar.gz" || exit $?
   cd -- "${nc4py}" || exit $?
   HDF5_DIR=${prefix} NETCDF4_DIR=${prefix} python setup.py install "--prefix=${prefix}" || exit $?
+fi
+
+# UDUNITS
+udu=udunits-2.2.17
+if ! [[ -e "${prefix}/bin/udunits2" ]] ; then
+  cd -- "${src_dir}" || exit $?
+  if [[ -d "${udu}" ]] ; then
+    rm -r "${udu}" || exit $?
+  fi
+  tar xf "${dist_dir}/${udu}.tar.gz" || exit $?
+  cd -- "${udu}" || exit $?
+  ./configure "--prefix=${prefix}" || exit $?
+  make || exit $?
+  make install || exit $?
+fi
+
+# cfunits
+cfu=cfunits-0.9.6
+if ! [[ -e "${prefix}/lib/python2.6/site-packages/${cfu}-py2.6.egg-info" ]] ; then
+  cd -- "${src_dir}" || exit $?
+  if [[ -d "${cfu}" ]] ; then
+    rm -r "${cfu}" || exit $?
+  fi
+  tar xf "${dist_dir}/${cfu}.tar.gz" || exit $?
+  cd -- "${cfu}" || exit $?
+  python setup.py install "--prefix=${prefix}" || exit $?
+fi
+
+# CFchecker
+if ! [[ -e "${prefix}/bin/cfchecker" ]] ; then
+  cfc=CFchecker
+  cd -- "${src_dir}" || exit $?
+  if [[ -d "${cfc}" ]] ; then
+    rm -r "${cfc}" || exit $?
+  fi
+  tar xf "${dist_dir}/${cfc}-1.6.0.tar.bz2" || exit $?
+  cd -- "${cfc}" || exit $?
+  python setup.py install "--prefix=${prefix}" || exit $?
 fi
 
