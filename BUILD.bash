@@ -8,6 +8,7 @@ declare -r src_dir=${prefix}/src
 
 export LD_LIBRARY_PATH=${prefix}/lib${LD_LIBRARY_PATH+:${LD_LIBRARY_PATH}}
 export PYTHONPATH=${prefix}/lib64/python2.6/site-packages:${prefix}/lib/python2.6/site-packages${PYTHONPATH+:${PYTHONPATH}}
+export PATH=${prefix}/bin${PATH+:${PATH}}
 
 mkdir -p -- "${src_dir}" || exit $?
 
@@ -87,9 +88,21 @@ if ! [[ -e "${prefix}/lib/python2.6/site-packages/${cfu}-py2.6.egg-info" ]] ; th
   python setup.py install "--prefix=${prefix}" || exit $?
 fi
 
+# nose
+if ! [[ -e "${prefix}/bin/nosetests" ]] ; then
+  nose=nose-release_1.3.4
+  cd -- "${src_dir}" || exit $?
+  if [[ -d "${nose}" ]] ; then
+    rm -r "${nose}" || exit $?
+  fi
+  tar xf "${dist_dir}/${nose}.tar.gz" || exit $?
+  cd -- "${nose}" || exit $?
+  python setup.py install "--prefix=${prefix}" || exit $?
+fi
+
 # CFchecker
+cfc=CFchecker
 if ! [[ -e "${prefix}/bin/cfchecker" ]] ; then
-  cfc=CFchecker
   cd -- "${src_dir}" || exit $?
   if [[ -d "${cfc}" ]] ; then
     rm -r "${cfc}" || exit $?
@@ -98,4 +111,7 @@ if ! [[ -e "${prefix}/bin/cfchecker" ]] ; then
   cd -- "${cfc}" || exit $?
   python setup.py install "--prefix=${prefix}" || exit $?
 fi
+
+cd -- "${src_dir}/${cfc}" || exit $?
+nosetests -v
 

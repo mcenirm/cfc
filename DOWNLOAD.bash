@@ -26,4 +26,5 @@ dl 2fd2365e1fe9685368cd6ab0ada532a0 'ftp://ftp.unidata.ucar.edu/pub/netcdf/netcd
 dl 78842b73560ec378142665e712ae4ad9 'http://downloads.sourceforge.net/project/numpy/NumPy/1.9.1/numpy-1.9.1.tar.gz'
 dl e876322cac0d939b5dd9ce53ad708b7e 'https://cfunits-python.googlecode.com/files/cfunits-0.9.6.tar.gz'
 dl b81ab8f24125ce18702ab7b3ca4d566f 'ftp://ftp.unidata.ucar.edu/pub/udunits/udunits-2.2.17.tar.gz'
+dl f1675f0200e704dfcd8f83c7e82c81ff 'https://github.com/nose-devs/nose/archive/release_1.3.4.tar.gz' 'nose-release_1.3.4.tar.gz'
 
