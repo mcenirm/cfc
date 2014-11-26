@@ -1,1 +1,8 @@
 dist
+bin
+include
+lib
+lib64
+share
+src
+man

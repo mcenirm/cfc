@@ -6,9 +6,11 @@ declare -r prefix=$(readlink -f $(dirname "$0"))
 declare -r dist_dir=${prefix}/dist
 declare -r src_dir=${prefix}/src
 
+virtualenv "${prefix}" || exit $?
+
+source "${prefix}"/bin/activate || exit $?
+
 export LD_LIBRARY_PATH=${prefix}/lib${LD_LIBRARY_PATH+:${LD_LIBRARY_PATH}}
-export PYTHONPATH=${prefix}/lib64/python2.6/site-packages:${prefix}/lib/python2.6/site-packages${PYTHONPATH+:${PYTHONPATH}}
-export PATH=${prefix}/bin${PATH+:${PATH}}
 
 mkdir -p -- "${src_dir}" || exit $?
 
@@ -38,30 +40,6 @@ if ! [[ -e "${prefix}/bin/ncdump" ]] ; then
   make check install || exit $?
 fi
 
-# numpy
-if ! [[ -e "${prefix}/bin/f2py" ]] ; then
-  numpy=numpy-1.9.1
-  cd -- "${src_dir}" || exit $?
-  if [[ -d "${numpy}" ]] ; then
-    rm -r "${numpy}" || exit $?
-  fi
-  tar xf "${dist_dir}/${numpy}.tar.gz" || exit $?
-  cd -- "${numpy}" || exit $?
-  python setup.py install "--prefix=${prefix}" || exit $?
-fi
-
-# netcdf4-python
-if ! [[ -e "${prefix}/bin/ncinfo" ]] ; then
-  nc4py=netcdf4-python-1.1.1rel
-  cd -- "${src_dir}" || exit $?
-  if [[ -d "${nc4py}" ]] ; then
-    rm -r "${nc4py}" || exit $?
-  fi
-  tar xf "${dist_dir}/${nc4py}.tar.gz" || exit $?
-  cd -- "${nc4py}" || exit $?
-  HDF5_DIR=${prefix} NETCDF4_DIR=${prefix} python setup.py install "--prefix=${prefix}" || exit $?
-fi
-
 # UDUNITS
 udu=udunits-2.2.17
 if ! [[ -e "${prefix}/bin/udunits2" ]] ; then
@@ -76,6 +54,18 @@ if ! [[ -e "${prefix}/bin/udunits2" ]] ; then
   make install || exit $?
 fi
 
+# newer lxml
+pip install lxml==3.4.1 || exit $?
+
+# numpy
+pip install numpy==1.9.1 || exit $?
+
+# netcdf4
+pip install netcdf4==1.1.1 || exit $?
+
+# nose
+pip install nose==1.3.4 || exit $?
+
 # cfunits
 cfu=cfunits-0.9.6
 if ! [[ -e "${prefix}/lib/python2.6/site-packages/${cfu}-py2.6.egg-info" ]] ; then
@@ -85,18 +75,6 @@ if ! [[ -e "${prefix}/lib/python2.6/site-packages/${cfu}-py2.6.egg-info" ]] ; th
   fi
   tar xf "${dist_dir}/${cfu}.tar.gz" || exit $?
   cd -- "${cfu}" || exit $?
-  python setup.py install "--prefix=${prefix}" || exit $?
-fi
-
-# nose
-if ! [[ -e "${prefix}/bin/nosetests" ]] ; then
-  nose=nose-release_1.3.4
-  cd -- "${src_dir}" || exit $?
-  if [[ -d "${nose}" ]] ; then
-    rm -r "${nose}" || exit $?
-  fi
-  tar xf "${dist_dir}/${nose}.tar.gz" || exit $?
-  cd -- "${nose}" || exit $?
   python setup.py install "--prefix=${prefix}" || exit $?
 fi
 
