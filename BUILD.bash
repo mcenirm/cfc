@@ -16,15 +16,15 @@ mkdir -p -- "${src_dir}" || exit $?
 
 # HDF5
 if ! [[ -e "${prefix}/bin/h5dump" ]] ; then
-  hdf5=hdf5-1.8.14-linux-centos6-x86_64-gcc447-shared
+  hdf5=hdf5-1.8.14
   cd -- "${src_dir}" || exit $?
   if [[ -d "${hdf5}" ]] ; then
     rm -r "${hdf5}" || exit $?
   fi
-  tar xf "${dist_dir}/${hdf5}.tar.gz" || exit $?
-  rsync -a "${hdf5}"/{bin,include,lib} "${prefix}/"
-  cd -- "${prefix}/bin" || exit $?
-  echo 'yes' | ./h5redeploy || exit $?
+  tar xf "${dist_dir}/${hdf5}.tar.bz2" || exit $?
+  cd -- "${hdf5}" || exit $?
+  ./configure "--prefix=${prefix}" || exit $?
+  make install || exit $?
 fi
 
 # netcdf4
@@ -54,29 +54,30 @@ if ! [[ -e "${prefix}/bin/udunits2" ]] ; then
   make install || exit $?
 fi
 
-# newer lxml
-pip install lxml==3.4.1 || exit $?
-
-# numpy
-pip install numpy==1.9.1 || exit $?
-
-# netcdf4
-pip install netcdf4==1.1.1 || exit $?
+function pip_or_easy () {
+  pkg_name=$1
+  pkg_version=$2
+  pkg_dist=${3-${pkg_name}-${pkg_version}.tar.gz}
+  cd -- "${prefix}" || exit $?
+  if ! pip install "${pkg_name}==${pkg_version}" ; then
+    easy_install -Z "${dist_dir}/${pkg_dist}" || exit $?
+  fi
+}
 
 # nose
-pip install nose==1.3.4 || exit $?
+pip_or_easy nose 1.3.4 nose-release_1.3.4
+
+# newer lxml
+pip_or_easy lxml 3.4.1
+
+# numpy
+pip_or_easy numpy 1.9.1
+
+# netcdf4
+HDF5_DIR=${prefix} NETCDF4_DIR=${prefix} pip_or_easy netcdf4 1.1.1 netcdf4-python-1.1.1rel.tar.gz
 
 # cfunits
-cfu=cfunits-0.9.6
-if ! [[ -e "${prefix}/lib/python2.6/site-packages/${cfu}-py2.6.egg-info" ]] ; then
-  cd -- "${src_dir}" || exit $?
-  if [[ -d "${cfu}" ]] ; then
-    rm -r "${cfu}" || exit $?
-  fi
-  tar xf "${dist_dir}/${cfu}.tar.gz" || exit $?
-  cd -- "${cfu}" || exit $?
-  python setup.py install "--prefix=${prefix}" || exit $?
-fi
+pip_or_easy cfunits 0.9.6
 
 # CFchecker
 cfc=CFchecker
